@@ -1,0 +1,6 @@
+{
+  "id": "fixture-receipt-001",
+  "category": "receipt",
+  "expected_extracted_text": "Coffee Bean & Tea Leaf Order #442 1x Cold Brew $4.50 Total: $4.50",
+  "keywords": ["coffee", "cold brew", "receipt", "tea leaf"]
+}

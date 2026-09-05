@@ -1,0 +1,49 @@
+﻿# =============================================================================
+# Pomniter App — Melos Monorepo Configuration
+# Orchestrates all Flutter/Dart packages in the repository
+# =============================================================================
+
+name: pomniter_app
+repository: https://github.com/markstone111/pomniter-app
+
+packages:
+  - apps/*
+  - packages/*
+
+command:
+  bootstrap:
+    usePubspecOverrides: true
+
+  version:
+    message: "chore(release): publish %s"
+    includeCommitId: true
+
+scripts:
+  # Analyze all packages
+  analyze:
+    run: melos exec -- "dart analyze --fatal-infos"
+    description: Run dart analyze in all packages
+
+  # Run tests across all packages
+  test:
+    run: melos exec -- "flutter test"
+    description: Run tests in all packages
+    packageFilters:
+      dirExists: test
+
+  # Format all Dart code
+  format:
+    run: melos exec -- "dart format ."
+    description: Format all Dart files
+
+  # Clean all packages
+  clean:
+    run: melos exec -- "flutter clean"
+    description: Clean all packages
+
+  # Generate code (build_runner, freezed, etc.)
+  generate:
+    run: melos exec -- "dart run build_runner build --delete-conflicting-outputs"
+    description: Run code generation in all packages
+    packageFilters:
+      dependsOn: build_runner
