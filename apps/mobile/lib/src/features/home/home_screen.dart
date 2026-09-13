@@ -177,7 +177,7 @@ class HomeScreen extends ConsumerWidget {
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (err, stack) => NeoCard(
                 backgroundColor: NeoColors.error,
-                child: Text('Error: ' + err.toString(), style: NeoTypography.bodyMedium),
+                child: Text('Error: $err', style: NeoTypography.bodyMedium),
               ),
               data: (screenshots) {
                 if (screenshots.isEmpty) {
@@ -196,7 +196,7 @@ class HomeScreen extends ConsumerWidget {
                   itemBuilder: (context, index) {
                     final item = screenshots[index];
                     return NeoCard(
-                      onTap: () => context.go('/detail/' + item.id),
+                      onTap: () => context.go('/detail/${item.id}'),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -220,7 +220,7 @@ class HomeScreen extends ConsumerWidget {
                                     NeoBadge(label: item.category.displayName),
                                     const Spacer(),
                                     Text(
-                                      item.capturedAt.day.toString() + '/' + item.capturedAt.month.toString(),
+                                      '${item.capturedAt.day}/${item.capturedAt.month}',
                                       style: NeoTypography.labelSmall.copyWith(
                                         fontFamily: NeoTypography.fontMono,
                                       ),

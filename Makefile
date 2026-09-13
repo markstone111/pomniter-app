@@ -1,9 +1,9 @@
-﻿# =============================================================================
+# =============================================================================
 # Pomniter App — Makefile
 # Convenience commands for development, testing, and deployment
 # =============================================================================
 
-.PHONY: help setup up down logs test lint clean
+.PHONY: help setup up down logs test lint clean gen
 
 # Default target
 help: ## Show this help
@@ -43,6 +43,11 @@ app-build-apk: ## Build Android APK
 
 app-build-ios: ## Build iOS (requires macOS)
 	cd apps/mobile && flutter build ios --release
+
+# ---------- Code Generation ----------
+gen: ## Generate ObjectBox entity binding code (run after changing @Entity classes)
+	cd packages/core-engine && dart run build_runner build --delete-conflicting-outputs
+	@echo "✅ ObjectBox objectbox.g.dart generated successfully"
 
 # ---------- Testing ----------
 test: ## Run all tests

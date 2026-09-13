@@ -27,7 +27,7 @@ class ScreenshotDetailScreen extends ConsumerWidget {
       ),
       body: screenshotAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(child: Text('Error: ' + err.toString())),
+        error: (err, _) => Center(child: Text('Error: $err')),
         data: (item) {
           if (item == null) {
             return const Center(child: Text('Screenshot not found'));
@@ -60,9 +60,9 @@ class ScreenshotDetailScreen extends ConsumerWidget {
                         children: [
                           NeoBadge(label: item.category.displayName),
                           const SizedBox(width: 8),
-                          NeoBadge(label: item.width.toString() + 'x' + item.height.toString()),
+                          NeoBadge(label: '${item.width}x${item.height}'),
                           const SizedBox(width: 8),
-                          NeoBadge(label: (item.fileSizeBytes / 1024).toStringAsFixed(0) + ' KB'),
+                          NeoBadge(label: '${(item.fileSizeBytes / 1024).toStringAsFixed(0)} KB'),
                         ],
                       ),
                     ],
@@ -128,7 +128,7 @@ class ScreenshotDetailScreen extends ConsumerWidget {
                     runSpacing: 8,
                     children: [
                       for (final tag in item.tags)
-                        NeoBadge(label: '#' + tag, color: NeoColors.cyan),
+                        NeoBadge(label: '#$tag', color: NeoColors.cyan),
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -141,9 +141,9 @@ class ScreenshotDetailScreen extends ConsumerWidget {
                     children: [
                       Text('METADATA', style: NeoTypography.labelMedium.copyWith(fontWeight: FontWeight.w900)),
                       const SizedBox(height: 8),
-                      Text('ID: ' + item.id, style: NeoTypography.bodySmall.copyWith(fontFamily: NeoTypography.fontMono)),
-                      Text('Captured: ' + item.capturedAt.toIso8601String(), style: NeoTypography.bodySmall.copyWith(fontFamily: NeoTypography.fontMono)),
-                      Text('Storage path: ' + item.filePath, style: NeoTypography.bodySmall.copyWith(fontFamily: NeoTypography.fontMono)),
+                      Text('ID: ${item.id}', style: NeoTypography.bodySmall.copyWith(fontFamily: NeoTypography.fontMono)),
+                      Text('Captured: ${item.capturedAt.toIso8601String()}', style: NeoTypography.bodySmall.copyWith(fontFamily: NeoTypography.fontMono)),
+                      Text('Storage path: ${item.filePath}', style: NeoTypography.bodySmall.copyWith(fontFamily: NeoTypography.fontMono)),
                     ],
                   ),
                 ),

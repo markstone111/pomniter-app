@@ -98,7 +98,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (err, _) => NeoCard(
                   backgroundColor: NeoColors.error,
-                  child: Text('Search error: ' + err.toString()),
+                  child: Text('Search error: $err'),
                 ),
                 data: (results) {
                   if (results.isEmpty) {
@@ -131,7 +131,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     itemBuilder: (context, index) {
                       final item = results[index];
                       return NeoCard(
-                        onTap: () => context.go('/detail/' + item.screenshot.id),
+                        onTap: () => context.go('/detail/${item.screenshot.id}'),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -145,7 +145,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                 NeoBadge(label: item.screenshot.category.displayName),
                                 const Spacer(),
                                 Text(
-                                  (item.score * 100).toInt().toString() + '% MATCH',
+                                  '${(item.score * 100).toInt()}% MATCH',
                                   style: NeoTypography.labelSmall.copyWith(
                                     fontFamily: NeoTypography.fontMono,
                                     fontWeight: FontWeight.w900,

@@ -13,12 +13,26 @@ dependencies:
     sdk: flutter
   pomniter_shared_models:
     path: ../shared-models
-
+  # On-device ONNX inference runtime
+  onnxruntime: ^1.4.1
+  # Pure-Dart image decoding & preprocessing
+  image: ^4.3.0
+  # Local embedded database with HNSW vector index
+  objectbox: ^5.3.2
+  objectbox_flutter_libs: ^5.3.2
+  # HTTP + file I/O for model download
+  http: ^1.2.2
+  path_provider: ^2.1.4
+  path: ^1.9.1
+  crypto: ^3.0.5
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  # ObjectBox code generator (run: dart run build_runner build)
+  objectbox_generator: ^5.3.2
+  build_runner: ^2.7.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

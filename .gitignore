@@ -1,4 +1,4 @@
-﻿# =============================================================================
+# =============================================================================
 # Pomniter App — .gitignore
 # Covers: Flutter/Dart, Python, Node.js, Docker, IDE, OS, ML models
 # =============================================================================
@@ -17,6 +17,7 @@
 
 # Generated files
 **/*.g.dart
+!**/objectbox.g.dart
 **/*.freezed.dart
 **/*.mocks.dart
 **/generated_plugin_registrant.dart

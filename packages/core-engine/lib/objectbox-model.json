@@ -1,0 +1,159 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:600744434621095931",
+      "lastPropertyId": "14:7739490019654648834",
+      "name": "ScreenshotEntity",
+      "properties": [
+        {
+          "id": "1:3706152324678215829",
+          "name": "obId",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:7023793627489041659",
+          "name": "appId",
+          "indexId": "1:755288377846488545",
+          "type": 9,
+          "flags": 34848
+        },
+        {
+          "id": "3:3679762910709058957",
+          "name": "filePath",
+          "type": 9
+        },
+        {
+          "id": "4:4579994230589263606",
+          "name": "capturedAt",
+          "type": 9
+        },
+        {
+          "id": "5:360277996769823230",
+          "name": "indexedAt",
+          "type": 9
+        },
+        {
+          "id": "6:6782086456134829284",
+          "name": "width",
+          "type": 6
+        },
+        {
+          "id": "7:839746291008913966",
+          "name": "height",
+          "type": 6
+        },
+        {
+          "id": "8:8372239392088160834",
+          "name": "fileSizeBytes",
+          "type": 6
+        },
+        {
+          "id": "9:1431467765007224391",
+          "name": "extractedText",
+          "type": 9
+        },
+        {
+          "id": "10:5189184286676698744",
+          "name": "tagsJson",
+          "type": 9
+        },
+        {
+          "id": "11:4486885043942402449",
+          "name": "category",
+          "type": 9
+        },
+        {
+          "id": "12:2005059483032248073",
+          "name": "summary",
+          "type": 9
+        },
+        {
+          "id": "13:5265260427299486085",
+          "name": "isFavorite",
+          "type": 1
+        },
+        {
+          "id": "14:7739490019654648834",
+          "name": "embedding",
+          "indexId": "2:2257159740347098099",
+          "type": 28,
+          "flags": 8
+        }
+      ],
+      "relations": [
+        {
+          "id": "1:1853320434411549886",
+          "name": "textBlocks",
+          "targetId": "2:6917378817221049129"
+        }
+      ]
+    },
+    {
+      "id": "2:6917378817221049129",
+      "lastPropertyId": "8:6673802799610011179",
+      "name": "TextBlockEntity",
+      "properties": [
+        {
+          "id": "1:799922033694723571",
+          "name": "obId",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:4667820326858414165",
+          "name": "text",
+          "type": 9
+        },
+        {
+          "id": "3:1823238620560094752",
+          "name": "confidence",
+          "type": 8
+        },
+        {
+          "id": "4:8270546729022063796",
+          "name": "boxLeft",
+          "type": 8
+        },
+        {
+          "id": "5:4000006501516465960",
+          "name": "boxTop",
+          "type": 8
+        },
+        {
+          "id": "6:4737089169307684592",
+          "name": "boxWidth",
+          "type": 8
+        },
+        {
+          "id": "7:6943942621993781023",
+          "name": "boxHeight",
+          "type": 8
+        },
+        {
+          "id": "8:6673802799610011179",
+          "name": "screenshotId",
+          "indexId": "3:6534838029152096322",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "ScreenshotEntity"
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "2:6917378817221049129",
+  "lastIndexId": "3:6534838029152096322",
+  "lastRelationId": "1:1853320434411549886",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [],
+  "retiredRelationUids": [],
+  "version": 1
+}

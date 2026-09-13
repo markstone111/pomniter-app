@@ -24,7 +24,7 @@ class GalleryScreen extends ConsumerWidget {
       ),
       body: screenshotsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(child: Text('Error: ' + err.toString())),
+        error: (err, _) => Center(child: Text('Error: $err')),
         data: (screenshots) {
           return GridView.builder(
             padding: const EdgeInsets.all(16),
@@ -38,7 +38,7 @@ class GalleryScreen extends ConsumerWidget {
             itemBuilder: (context, index) {
               final item = screenshots[index];
               return NeoCard(
-                onTap: () => context.go('/detail/' + item.id),
+                onTap: () => context.go('/detail/${item.id}'),
                 padding: const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

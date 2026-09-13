@@ -55,13 +55,17 @@
 - [x] **`packages/core-engine`**:
   - Interfaces: `ScreenshotRepository`, `SearchRepository`, `OcrEngine`, `EmbeddingEngine`, `AuthRepository`.
   - In-memory & mock implementations for reliable offline testability.
+  - Phase 1.6 On-Device ONNX ML: `OnnxOcrEngine` (PP-OCRv4 detection & recognition), `OnnxClipEmbeddingEngine` (MobileCLIP-S0 384-dim), `ClipTokenizer` (BPE), `engine_exceptions.dart`.
+  - Phase 1.7 ObjectBox Local Vector DB: `ScreenshotEntity` (with `@HnswIndex` 384-dim float vector), `TextBlockEntity`, `ObjectBoxScreenshotRepository`, `ObjectBoxSearchRepository`, `openObjectBoxStore`.
   - Use cases: `ProcessScreenshotUseCase`, `SearchScreenshotsUseCase`.
-  - **Tests**: 2/2 passed (`flutter test`), 0 analyzer issues.
+  - **Tests**: 14/14 passed (`flutter test`), 0 analyzer issues.
 - [x] **`apps/mobile`**:
   - State: Flutter Riverpod 2.6.
-  - Router: GoRouter 14.8.
-  - 5 screens built: `HomeScreen`, `SearchScreen`, `GalleryScreen`, `ScreenshotDetailScreen`, `SettingsScreen`.
-  - **Tests**: App boot & navigation test passed (`flutter test`), 0 analyzer issues.
+  - Router: GoRouter 14.8 with `/init` onboarding route.
+  - Screens: `HomeScreen`, `SearchScreen`, `GalleryScreen`, `ScreenshotDetailScreen`, `SettingsScreen`, `MlInitScreen`.
+  - Services: `ModelDownloadManager` (CDN streaming with SHA-256 checksums and local caching).
+  - Providers: ObjectBox & ONNX engine providers in `engine_providers.dart`.
+  - **Tests**: 1/1 passed (`flutter test`), 0 analyzer issues.
 
 ### Infrastructure & Telemetry:
 - [x] **`docker-compose.yml`**: PostgreSQL 16, Redis 7, MinIO S3, Kafka 3.7 KRaft, Prometheus, Grafana.
@@ -74,16 +78,11 @@
 
 ## 🚀 Next Steps Roadmap (When Resuming)
 
-1. **On-Device ML Pipeline (Phase 1.6)**:
-   - Integrate ONNX Runtime Flutter plugin (`onnxruntime_flutter`).
-   - Bundle/quantize PaddleOCR-Lite (PP-OCRv4) text detection and recognition models.
-   - Integrate MobileCLIP-S0 for 384-dimensional visual/text multimodal embeddings.
-2. **Local Vector Database (Phase 1.7)**:
-   - Integrate ObjectBox Flutter with HNSW vector index support.
-   - Implement `ObjectBoxScreenshotRepository` and `ObjectBoxSearchRepository`.
-   - Verify 100% offline text and semantic search flow.
-3. **Backend Microservices Scaffolding (Phase 1.8)**:
-   - `services/api-gateway`: Fastify + TypeScript.
-   - `services/ocr-service`: FastAPI + PaddleOCR.
-   - `services/embedding-service`: FastAPI + PyTorch/ONNX CLIP.
-   - `services/search-service`: FastAPI + Hybrid search.
+1. **Backend Microservices Scaffolding (Phase 1.8)**:
+   - `services/api-gateway`: Fastify + TypeScript (JWT auth, screenshot upload, search proxy).
+   - `services/ocr-service`: FastAPI + PaddleOCR (Kafka consumer `screenshot.uploaded` -> producer `screenshot.ocr.completed`).
+   - `services/embedding-service`: FastAPI + MobileCLIP/OpenCLIP (consumer `screenshot.ocr.completed` -> producer `screenshot.embedding.completed`).
+   - `services/search-service`: FastAPI + Qdrant/Postgres hybrid search (consumer `screenshot.embedding.completed` -> indexer).
+2. **Cloud Sync & E2E Mobile-Backend Integration (Phase 1.9)**:
+   - Optional encrypted sync between local ObjectBox and cloud PostgreSQL/Qdrant.
+   - Background sync worker and conflict resolution.
