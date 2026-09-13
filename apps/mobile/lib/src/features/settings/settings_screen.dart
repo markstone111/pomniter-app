@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:pomniter_design_system/pomniter_design_system.dart';
 import '../../providers/theme_provider.dart';
 
@@ -10,14 +9,10 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
+    final neo = NeoTheme.of(context);
 
-    return NeoScaffold(
-      currentIndex: 3,
-      onTabChanged: (index) {
-        if (index == 0) context.go('/home');
-        if (index == 1) context.go('/search');
-        if (index == 2) context.go('/gallery');
-      },
+    return Scaffold(
+      backgroundColor: neo.bgMain,
       appBar: const NeoAppBar(
         title: 'SETTINGS',
       ),
@@ -60,7 +55,9 @@ class SettingsScreen extends ConsumerWidget {
             const SizedBox(height: 20),
 
             // Appearance section
-            Text('APPEARANCE', style: NeoTypography.headlineSmall.copyWith(fontWeight: FontWeight.w900)),
+            Text('APPEARANCE',
+                style: NeoTypography.headlineSmall
+                    .copyWith(fontWeight: FontWeight.w900)),
             const SizedBox(height: 10),
             NeoCard(
               child: Row(
@@ -69,16 +66,20 @@ class SettingsScreen extends ConsumerWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('DARK MODE', style: NeoTypography.labelMedium.copyWith(fontWeight: FontWeight.bold)),
-                      Text('High-contrast neo-brutal dark theme', style: NeoTypography.bodySmall),
+                      Text('DARK MODE',
+                          style: NeoTypography.labelMedium
+                              .copyWith(fontWeight: FontWeight.bold)),
+                      Text('High-contrast neo-brutal dark theme',
+                          style: NeoTypography.bodySmall),
                     ],
                   ),
                   Switch(
                     value: themeMode == ThemeMode.dark,
                     activeThumbColor: NeoColors.yellow,
                     onChanged: (isDark) {
-                      ref.read(themeModeProvider.notifier).state =
-                          isDark ? ThemeMode.dark : ThemeMode.light;
+                      ref.read(themeModeProvider.notifier).setMode(
+                            isDark ? ThemeMode.dark : ThemeMode.light,
+                          );
                     },
                   ),
                 ],
@@ -87,7 +88,9 @@ class SettingsScreen extends ConsumerWidget {
             const SizedBox(height: 24),
 
             // Engine & Hardware section
-            Text('AI & STORAGE', style: NeoTypography.headlineSmall.copyWith(fontWeight: FontWeight.w900)),
+            Text('AI & STORAGE',
+                style: NeoTypography.headlineSmall
+                    .copyWith(fontWeight: FontWeight.w900)),
             const SizedBox(height: 10),
             NeoCard(
               child: Column(
@@ -98,20 +101,24 @@ class SettingsScreen extends ConsumerWidget {
                   const Divider(),
                   _settingsRow('Vector Index', 'ObjectBox HNSW Index'),
                   const Divider(),
-                  _settingsRow('Storage Used', '2.3 MB (5 screenshots)'),
+                  _settingsRow('Storage Used', 'Local On-Device Database'),
                 ],
               ),
             ),
             const SizedBox(height: 24),
 
             // Open Source & About
-            Text('ABOUT POMNITER', style: NeoTypography.headlineSmall.copyWith(fontWeight: FontWeight.w900)),
+            Text('ABOUT POMNITER',
+                style: NeoTypography.headlineSmall
+                    .copyWith(fontWeight: FontWeight.w900)),
             const SizedBox(height: 10),
             NeoCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('VERSION 1.0.0-ALPHA', style: NeoTypography.labelMedium.copyWith(fontWeight: FontWeight.bold)),
+                  Text('VERSION 1.0.0-ALPHA',
+                      style: NeoTypography.labelMedium
+                          .copyWith(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 4),
                   Text(
                     'Built with Flutter, Apache 2.0 Open Source, Local-First AI architecture.',
@@ -138,7 +145,9 @@ class SettingsScreen extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: NeoTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+          Text(label,
+              style:
+                  NeoTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
           Text(
             value,
             style: NeoTypography.bodySmall.copyWith(

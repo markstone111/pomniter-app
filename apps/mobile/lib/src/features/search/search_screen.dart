@@ -25,14 +25,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   Widget build(BuildContext context) {
     final searchResultsAsync = ref.watch(searchResultsProvider);
     final activeCategory = ref.watch(selectedCategoryFilterProvider);
+    final neo = NeoTheme.of(context);
 
-    return NeoScaffold(
-      currentIndex: 1,
-      onTabChanged: (index) {
-        if (index == 0) context.go('/home');
-        if (index == 2) context.go('/gallery');
-        if (index == 3) context.go('/settings');
-      },
+    return Scaffold(
+      backgroundColor: neo.bgMain,
       appBar: const NeoAppBar(
         title: 'SEARCH ENGINE',
       ),
@@ -45,7 +41,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               controller: _searchController,
               hintText: 'Type keywords, numbers, or natural query...',
               isSearch: true,
-              autofocus: true,
+              autofocus: false,
               onChanged: (val) {
                 ref.read(searchQueryTextProvider.notifier).state = val;
               },
@@ -59,11 +55,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      ref.read(selectedCategoryFilterProvider.notifier).state = null;
+                      ref.read(selectedCategoryFilterProvider.notifier).state =
+                          null;
                     },
                     child: NeoBadge(
                       label: 'ALL',
-                      color: activeCategory == null ? NeoColors.yellow : NeoColors.white,
+                      color: activeCategory == null
+                          ? NeoColors.yellow
+                          : NeoColors.white,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -76,13 +75,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   ]) ...[
                     GestureDetector(
                       onTap: () {
-                        final current = ref.read(selectedCategoryFilterProvider);
-                        ref.read(selectedCategoryFilterProvider.notifier).state =
-                            current == cat ? null : cat;
+                        final current =
+                            ref.read(selectedCategoryFilterProvider);
+                        ref
+                            .read(selectedCategoryFilterProvider.notifier)
+                            .state = current == cat ? null : cat;
                       },
                       child: NeoBadge(
                         label: cat.displayName,
-                        color: activeCategory == cat ? NeoColors.yellow : NeoColors.white,
+                        color: activeCategory == cat
+                            ? NeoColors.yellow
+                            : NeoColors.white,
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -108,11 +111,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.search_off, size: 48, color: NeoColors.black),
+                            const Icon(Icons.search_off,
+                                size: 48, color: NeoColors.black),
                             const SizedBox(height: 12),
                             Text(
                               'NO MATCHES FOUND',
-                              style: NeoTypography.headlineSmall.copyWith(fontWeight: FontWeight.w900),
+                              style: NeoTypography.headlineSmall
+                                  .copyWith(fontWeight: FontWeight.w900),
                             ),
                             const SizedBox(height: 8),
                             const Text(
@@ -131,7 +136,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     itemBuilder: (context, index) {
                       final item = results[index];
                       return NeoCard(
-                        onTap: () => context.go('/detail/${item.screenshot.id}'),
+                        onTap: () =>
+                            context.push('/detail/${item.screenshot.id}'),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -139,10 +145,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                               children: [
                                 NeoBadge(
                                   label: item.matchType.label,
-                                  color: item.score > 0.9 ? NeoColors.green : NeoColors.cyan,
+                                  color: item.score > 0.9
+                                      ? NeoColors.green
+                                      : NeoColors.cyan,
                                 ),
                                 const SizedBox(width: 8),
-                                NeoBadge(label: item.screenshot.category.displayName),
+                                NeoBadge(
+                                    label: item.screenshot.category.displayName),
                                 const Spacer(),
                                 Text(
                                   '${(item.score * 100).toInt()}% MATCH',
@@ -155,8 +164,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                             ),
                             const SizedBox(height: 10),
                             Text(
-                              item.screenshot.summary ?? item.screenshot.extractedText,
-                              style: NeoTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold),
+                              item.screenshot.summary ??
+                                  item.screenshot.extractedText,
+                              style: NeoTypography.bodyLarge
+                                  .copyWith(fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 6),
                             Container(

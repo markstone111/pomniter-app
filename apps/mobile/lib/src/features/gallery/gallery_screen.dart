@@ -11,14 +11,10 @@ class GalleryScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final screenshotsAsync = ref.watch(screenshotsListProvider);
+    final neo = NeoTheme.of(context);
 
-    return NeoScaffold(
-      currentIndex: 2,
-      onTabChanged: (index) {
-        if (index == 0) context.go('/home');
-        if (index == 1) context.go('/search');
-        if (index == 3) context.go('/settings');
-      },
+    return Scaffold(
+      backgroundColor: neo.bgMain,
       appBar: const NeoAppBar(
         title: 'ALL MEMORIES',
       ),
@@ -26,6 +22,12 @@ class GalleryScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, _) => Center(child: Text('Error: $err')),
         data: (screenshots) {
+          if (screenshots.isEmpty) {
+            return const Center(
+              child: Text('No screenshots in gallery yet.'),
+            );
+          }
+
           return GridView.builder(
             padding: const EdgeInsets.all(16),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -38,7 +40,7 @@ class GalleryScreen extends ConsumerWidget {
             itemBuilder: (context, index) {
               final item = screenshots[index];
               return NeoCard(
-                onTap: () => context.go('/detail/${item.id}'),
+                onTap: () => context.push('/detail/${item.id}'),
                 padding: const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

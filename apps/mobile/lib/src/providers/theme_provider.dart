@@ -1,9 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pomniter_design_system/pomniter_design_system.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-/// Provider managing active ThemeMode (light or dark).
-final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.light);
+const String _kThemeKey = 'pomniter_theme_mode';
+
+/// SharedPreferences instance provider, overridden at app startup.
+final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
+  throw UnimplementedError('sharedPreferencesProvider must be overridden in ProviderScope');
+});
+
+/// StateNotifier that keeps ThemeMode synchronized with persistent storage.
+class ThemeModeNotifier extends StateNotifier<ThemeMode> {
+  final SharedPreferences _prefs;
+
+  ThemeModeNotifier(this._prefs) : super(_loadInitialMode(_prefs));
+
+  static ThemeMode _loadInitialMode(SharedPreferences prefs) {
+    final saved = prefs.getString(_kThemeKey);
+    if (saved == 'dark') return ThemeMode.dark;
+    if (saved == 'light') return ThemeMode.light;
+    return ThemeMode.light;
+  }
+
+  Future<void> setMode(ThemeMode mode) async {
+    if (state == mode) return;
+    state = mode;
+    await _prefs.setString(_kThemeKey, mode == ThemeMode.dark ? 'dark' : 'light');
+  }
+
+  Future<void> toggle() async {
+    await setMode(state == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark);
+  }
+}
+
+/// Global provider for active ThemeMode.
+final themeModeProvider =
+    StateNotifierProvider<ThemeModeNotifier, ThemeMode>((ref) {
+  final prefs = ref.watch(sharedPreferencesProvider);
+  return ThemeModeNotifier(prefs);
+});
 
 /// Resolved NeoThemeData based on active ThemeMode.
 final neoThemeProvider = Provider<NeoThemeData>((ref) {

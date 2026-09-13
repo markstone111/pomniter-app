@@ -24,7 +24,7 @@ subprojects {
         project.afterEvaluate {
             val android = project.extensions.findByName("android") as? com.android.build.gradle.BaseExtension
             android?.apply {
-                compileSdkVersion(35)
+                compileSdkVersion(36)
                 defaultConfig {
                     targetSdkVersion(35)
                 }

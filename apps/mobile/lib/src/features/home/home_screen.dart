@@ -1,25 +1,97 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:pomniter_design_system/pomniter_design_system.dart';
 import 'package:pomniter_shared_models/pomniter_shared_models.dart';
+import '../../providers/engine_providers.dart';
 import '../../providers/screenshot_providers.dart';
+import '../../widgets/neo_toast.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
+
+  Future<void> _handleImport(BuildContext context, WidgetRef ref) async {
+    try {
+      final picker = ImagePicker();
+      final picked = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 90,
+      );
+
+      if (picked == null) {
+        return;
+      }
+
+      final docsDir = await getApplicationDocumentsDirectory();
+      final screenshotsDir =
+          Directory(p.join(docsDir.path, 'imported_screenshots'));
+      if (!await screenshotsDir.exists()) {
+        await screenshotsDir.create(recursive: true);
+      }
+
+      final timestamp = DateTime.now();
+      final fileExt = p.extension(picked.path).isNotEmpty
+          ? p.extension(picked.path)
+          : '.png';
+      final fileName = 'import_${timestamp.millisecondsSinceEpoch}$fileExt';
+      final savedFile =
+          await File(picked.path).copy(p.join(screenshotsDir.path, fileName));
+      final fileLength = await savedFile.length();
+
+      final newScreenshot = Screenshot(
+        id: 'sc-imp-${timestamp.millisecondsSinceEpoch}',
+        filePath: savedFile.path,
+        capturedAt: timestamp,
+        indexedAt: timestamp,
+        width: 1080,
+        height: 1920,
+        fileSizeBytes: fileLength,
+        category: ScreenshotCategory.document,
+        extractedText:
+            'Imported Screenshot (${p.basename(picked.path)})\nSaved to local storage on ${timestamp.toLocal()}',
+        tags: ['imported', 'gallery'],
+        summary: 'Imported gallery screenshot saved to local memory engine',
+      );
+
+      final repo = ref.read(screenshotRepoProvider);
+      await repo.saveScreenshot(newScreenshot);
+
+      final searchRepo = ref.read(searchRepoProvider);
+      await searchRepo.indexScreenshot(newScreenshot);
+
+      ref.invalidate(screenshotsListProvider);
+
+      if (context.mounted) {
+        showNeoToast(
+          context,
+          'Screenshot imported & indexed locally!',
+          isSuccess: true,
+          icon: Icons.check_circle_outline,
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        showNeoToast(
+          context,
+          'Failed to import screenshot: $e',
+          isError: true,
+          icon: Icons.error_outline,
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final screenshotsAsync = ref.watch(screenshotsListProvider);
     final neo = NeoTheme.of(context);
 
-    return NeoScaffold(
-      currentIndex: 0,
-      onTabChanged: (index) {
-        if (index == 1) context.go('/search');
-        if (index == 2) context.go('/gallery');
-        if (index == 3) context.go('/settings');
-      },
+    return Scaffold(
+      backgroundColor: neo.bgMain,
       appBar: NeoAppBar(
         title: 'POMNITER',
         actions: [
@@ -30,14 +102,7 @@ class HomeScreen extends ConsumerWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Auto-indexing active: screenshots captured on device are indexed automatically.'),
-              backgroundColor: NeoColors.black,
-            ),
-          );
-        },
+        onPressed: () => _handleImport(context, ref),
         backgroundColor: NeoColors.yellow,
         foregroundColor: NeoColors.black,
         shape: RoundedRectangleBorder(
@@ -88,7 +153,8 @@ class HomeScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 12),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                     decoration: BoxDecoration(
                       color: NeoColors.white,
                       border: NeoBorders.standard(),
@@ -122,9 +188,22 @@ class HomeScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('INDEXED', style: NeoTypography.labelSmall.copyWith(fontWeight: FontWeight.bold)),
+                        Text('INDEXED',
+                            style: NeoTypography.labelSmall
+                                .copyWith(fontWeight: FontWeight.bold)),
                         const SizedBox(height: 4),
-                        Text('5 SHOTS', style: NeoTypography.headlineMedium.copyWith(fontWeight: FontWeight.w900)),
+                        screenshotsAsync.maybeWhen(
+                          data: (items) => Text(
+                            '${items.length} SHOTS',
+                            style: NeoTypography.headlineMedium
+                                .copyWith(fontWeight: FontWeight.w900),
+                          ),
+                          orElse: () => Text(
+                            '-- SHOTS',
+                            style: NeoTypography.headlineMedium
+                                .copyWith(fontWeight: FontWeight.w900),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -136,9 +215,13 @@ class HomeScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('PRIVACY', style: NeoTypography.labelSmall.copyWith(fontWeight: FontWeight.bold)),
+                        Text('PRIVACY',
+                            style: NeoTypography.labelSmall
+                                .copyWith(fontWeight: FontWeight.bold)),
                         const SizedBox(height: 4),
-                        Text('100% LOCAL', style: NeoTypography.headlineMedium.copyWith(fontWeight: FontWeight.w900)),
+                        Text('100% LOCAL',
+                            style: NeoTypography.headlineMedium
+                                .copyWith(fontWeight: FontWeight.w900)),
                       ],
                     ),
                   ),
@@ -196,7 +279,7 @@ class HomeScreen extends ConsumerWidget {
                   itemBuilder: (context, index) {
                     final item = screenshots[index];
                     return NeoCard(
-                      onTap: () => context.go('/detail/${item.id}'),
+                      onTap: () => context.push('/detail/${item.id}'),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -208,7 +291,8 @@ class HomeScreen extends ConsumerWidget {
                               border: NeoBorders.standard(),
                               borderRadius: NeoBorders.radius,
                             ),
-                            child: Icon(_categoryIcon(item.category), size: 28, color: NeoColors.black),
+                            child: Icon(_categoryIcon(item.category),
+                                size: 28, color: NeoColors.black),
                           ),
                           const SizedBox(width: 14),
                           Expanded(

@@ -1,12 +1,21 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomniter_mobile/src/app.dart';
+import 'package:pomniter_mobile/src/providers/theme_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  testWidgets('PomniterApp boots with home screen and neo-brutal branding', (WidgetTester tester) async {
+  testWidgets('PomniterApp boots with home screen and neo-brutal branding',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+
     await tester.pumpWidget(
-      const ProviderScope(
-        child: PomniterApp(),
+      ProviderScope(
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
+        ],
+        child: const PomniterApp(),
       ),
     );
 
