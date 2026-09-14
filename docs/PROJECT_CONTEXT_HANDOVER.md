@@ -68,21 +68,25 @@
   - **Tests**: 1/1 passed (`flutter test`), 0 analyzer issues.
 
 ### Infrastructure & Telemetry:
-- [x] **`docker-compose.yml`**: PostgreSQL 16, Redis 7, MinIO S3, Kafka 3.7 KRaft, Prometheus, Grafana.
+- [x] **`docker-compose.yml`**: PostgreSQL 16, Redis 7, MinIO S3, Kafka 3.7 KRaft, Prometheus, Grafana, API Gateway, OCR Service, Embedding Service, Search Service.
 - [x] **SQL Schema**: `infra/docker/postgres/init.sql` (`users`, `screenshots`, `text_blocks`, `screenshot_tags`, `search_logs`).
 - [x] **Kafka Topics**: `infra/scripts/create-kafka-topics.ps1` (`screenshot.uploaded`, `screenshot.ocr.completed`, `screenshot.embedding.completed`, `screenshot.indexed`).
 - [x] **Telemetry Configs**: `telemetry/prometheus/prometheus.yml`, `telemetry/grafana/datasources/datasources.yaml`.
-- [x] **E2E Infrastructure Tests**: `tests/integration/test_pipeline_e2e.py` (3/3 passed).
+- [x] **E2E Infrastructure & Pipeline Tests**: `tests/integration/test_pipeline_e2e.py` (6/6 passed).
+
+### Backend Microservices (Phase 1.8):
+- [x] **`services/api-gateway`**: Fastify 4 + TypeScript (JWT auth, multipart upload, MinIO/local storage, Kafka producer, Prometheus `/metrics`). 6/6 tests passed (`vitest`).
+- [x] **`services/ocr-service`**: FastAPI + PaddleOCR/ONNX engine (port 8001, text block extraction, Kafka consumer `screenshot.uploaded` -> producer `screenshot.ocr.completed`, Prometheus `/metrics`). 4/4 tests passed (`pytest`).
+- [x] **`services/embedding-service`**: FastAPI + MobileCLIP-S0 (port 8002, 384-dimensional normalized vector embeddings, Kafka consumer `screenshot.ocr.completed` -> producer `screenshot.embedding.completed`, Prometheus `/metrics`). 5/5 tests passed (`pytest`).
+- [x] **`services/search-service`**: FastAPI + Hybrid Search (port 8003, Reciprocal Rank Fusion lexical & semantic scoring, Kafka consumer `screenshot.embedding.completed` -> indexer -> producer `screenshot.indexed`, Prometheus `/metrics`). 5/5 tests passed (`pytest`).
 
 ---
 
 ## 🚀 Next Steps Roadmap (When Resuming)
 
-1. **Backend Microservices Scaffolding (Phase 1.8)**:
-   - `services/api-gateway`: Fastify + TypeScript (JWT auth, screenshot upload, search proxy).
-   - `services/ocr-service`: FastAPI + PaddleOCR (Kafka consumer `screenshot.uploaded` -> producer `screenshot.ocr.completed`).
-   - `services/embedding-service`: FastAPI + MobileCLIP/OpenCLIP (consumer `screenshot.ocr.completed` -> producer `screenshot.embedding.completed`).
-   - `services/search-service`: FastAPI + Qdrant/Postgres hybrid search (consumer `screenshot.embedding.completed` -> indexer).
-2. **Cloud Sync & E2E Mobile-Backend Integration (Phase 1.9)**:
-   - Optional encrypted sync between local ObjectBox and cloud PostgreSQL/Qdrant.
-   - Background sync worker and conflict resolution.
+1. **Cloud Sync & Mobile-Backend Integration (Phase 1.9)**:
+   - Encrypted sync client in `apps/mobile` syncing local ObjectBox vectors to API Gateway.
+   - Background screenshot auto-detection worker for Android (MediaStore / ContentObserver).
+2. **First-Launch Privacy & Transparency Agreement**:
+   - First-run acceptance modal explaining local-first guarantees and optional cloud backup.
+

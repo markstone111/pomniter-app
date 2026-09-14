@@ -105,6 +105,64 @@ services:
     depends_on:
       - prometheus
 
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+      dockerfile: Dockerfile
+    container_name: pomniter-api-gateway
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - HOST=0.0.0.0
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - SEARCH_SERVICE_URL=http://search-service:8003
+    depends_on:
+      - postgres
+      - kafka
+
+  ocr-service:
+    build:
+      context: ./services/ocr-service
+      dockerfile: Dockerfile
+    container_name: pomniter-ocr-service
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      - kafka
+
+  embedding-service:
+    build:
+      context: ./services/embedding-service
+      dockerfile: Dockerfile
+    container_name: pomniter-embedding-service
+    restart: unless-stopped
+    ports:
+      - "8002:8002"
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      - kafka
+
+  search-service:
+    build:
+      context: ./services/search-service
+      dockerfile: Dockerfile
+    container_name: pomniter-search-service
+    restart: unless-stopped
+    ports:
+      - "8003:8003"
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - POSTGRES_HOST=postgres
+    depends_on:
+      - kafka
+      - postgres
+
 volumes:
   postgres_data:
   redis_data:
