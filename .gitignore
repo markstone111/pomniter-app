@@ -58,6 +58,7 @@ docker-compose.override.yml
 .env
 .env.local
 .env.*.local
+*.text
 !.env.example
 
 # ---------- IDE ----------

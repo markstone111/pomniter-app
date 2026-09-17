@@ -46,3 +46,8 @@ final neoThemeProvider = Provider<NeoThemeData>((ref) {
   final mode = ref.watch(themeModeProvider);
   return mode == ThemeMode.dark ? NeoThemeData.dark : NeoThemeData.light;
 });
+
+/// The initial route for the app — set at startup based on whether the
+/// user has previously accepted the privacy consent screen.
+/// Overridden in [ProviderScope] from [main.dart].
+final initialRouteProvider = Provider<String>((ref) => '/home');

@@ -9,6 +9,7 @@ import 'package:pomniter_design_system/pomniter_design_system.dart';
 import 'package:pomniter_shared_models/pomniter_shared_models.dart';
 import '../../providers/engine_providers.dart';
 import '../../providers/screenshot_providers.dart';
+import '../../providers/indexer_providers.dart';
 import '../../widgets/neo_toast.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -228,7 +229,50 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 28),
+
+            // Live Auto-Indexer Status Bar
+            const SizedBox(height: 12),
+            Consumer(
+              builder: (context, ref, _) {
+                final indexerState = ref.watch(indexerProvider);
+                final isRunning = indexerState.isRunning;
+                return NeoCard(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: isRunning ? NeoColors.green : NeoColors.gray400,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          indexerState.statusText,
+                          style: NeoTypography.bodySmall.copyWith(
+                            fontFamily: NeoTypography.fontMono,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      if (!indexerState.isEnabled)
+                        GestureDetector(
+                          onTap: () => context.go('/settings'),
+                          child: NeoBadge(
+                            label: 'ENABLE →',
+                            color: NeoColors.yellow,
+                            textColor: NeoColors.black,
+                          ),
+                        ),
+                    ],
+                  ),
+                );
+              },
+            ),
+
 
             // Section Header
             Row(

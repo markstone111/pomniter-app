@@ -10,6 +10,7 @@ class PomniterApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final neoThemeData = ref.watch(neoThemeProvider);
+    final router = ref.watch(appRouterProvider);
 
     return NeoTheme(
       data: neoThemeData,
@@ -19,8 +20,9 @@ class PomniterApp extends ConsumerWidget {
         theme: NeoTheme.toMaterialTheme(NeoThemeData.light),
         darkTheme: NeoTheme.toMaterialTheme(NeoThemeData.dark),
         themeMode: neoThemeData.isDark ? ThemeMode.dark : ThemeMode.light,
-        routerConfig: appRouter,
+        routerConfig: router,
       ),
     );
   }
 }
+

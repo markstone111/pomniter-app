@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pomniter_design_system/pomniter_design_system.dart';
 import '../../providers/theme_provider.dart';
+import '../../providers/indexer_providers.dart';
+import '../../services/cloud_sync_service.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -9,19 +11,19 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
+    final indexerState = ref.watch(indexerProvider);
+    final syncState = ref.watch(cloudSyncProvider);
     final neo = NeoTheme.of(context);
 
     return Scaffold(
       backgroundColor: neo.bgMain,
-      appBar: const NeoAppBar(
-        title: 'SETTINGS',
-      ),
+      appBar: const NeoAppBar(title: 'SETTINGS'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Engine Status Card
+            // ── Local-First Banner ────────────────────────────────────────
             NeoCard(
               backgroundColor: NeoColors.green,
               child: Row(
@@ -41,10 +43,9 @@ class SettingsScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'Your screenshots and OCR vectors never leave this device.',
-                          style: NeoTypography.bodySmall.copyWith(
-                            color: NeoColors.black,
-                          ),
+                          'Your screenshots and OCR vectors never leave this device by default.',
+                          style:
+                              NeoTypography.bodySmall.copyWith(color: NeoColors.black),
                         ),
                       ],
                     ),
@@ -52,9 +53,9 @@ class SettingsScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
 
-            // Appearance section
+            // ── Appearance ────────────────────────────────────────────────
             Text('APPEARANCE',
                 style: NeoTypography.headlineSmall
                     .copyWith(fontWeight: FontWeight.w900)),
@@ -87,7 +88,168 @@ class SettingsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
 
-            // Engine & Hardware section
+            // ── Auto-Indexing ─────────────────────────────────────────────
+            Text('AUTO-INDEXING',
+                style: NeoTypography.headlineSmall
+                    .copyWith(fontWeight: FontWeight.w900)),
+            const SizedBox(height: 10),
+            NeoCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('AUTO-INDEX SCREENSHOTS',
+                                style: NeoTypography.labelMedium
+                                    .copyWith(fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 2),
+                            Text(
+                              'Automatically indexes new screenshots as you take them.',
+                              style: NeoTypography.bodySmall,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Switch(
+                        value: indexerState.isEnabled,
+                        activeThumbColor: NeoColors.green,
+                        onChanged: (enabled) async {
+                          if (enabled) {
+                            await ref.read(indexerProvider.notifier).enable();
+                          } else {
+                            await ref.read(indexerProvider.notifier).disable();
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: indexerState.isRunning
+                          ? NeoColors.green.withValues(alpha: 0.1)
+                          : neo.bgMain,
+                      border: NeoBorders.standard(),
+                      borderRadius: NeoBorders.radius,
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: indexerState.isRunning
+                                ? NeoColors.green
+                                : NeoColors.gray400,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            indexerState.statusText,
+                            style: NeoTypography.bodySmall.copyWith(
+                              fontFamily: NeoTypography.fontMono,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // ── Cloud Backup ──────────────────────────────────────────────
+            Text('CLOUD BACKUP',
+                style: NeoTypography.headlineSmall
+                    .copyWith(fontWeight: FontWeight.w900)),
+            const SizedBox(height: 4),
+            Text(
+              'Optional. Wi-Fi only. Metadata only — your images stay on-device.',
+              style: NeoTypography.bodySmall.copyWith(color: neo.textMuted),
+            ),
+            const SizedBox(height: 10),
+            NeoCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('ENABLE CLOUD BACKUP',
+                                style: NeoTypography.labelMedium
+                                    .copyWith(fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 2),
+                            Text(
+                                'Syncs screenshot metadata to Pomniter Cloud',
+                                style: NeoTypography.bodySmall),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Switch(
+                        value: syncState.isEnabled,
+                        activeThumbColor: NeoColors.cyan,
+                        onChanged: (enabled) async {
+                          if (enabled) {
+                            await ref.read(cloudSyncProvider.notifier).enable();
+                          } else {
+                            await ref
+                                .read(cloudSyncProvider.notifier)
+                                .disable();
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                  if (syncState.isEnabled) ...[
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            syncState.statusText,
+                            style: NeoTypography.bodySmall.copyWith(
+                              fontFamily: NeoTypography.fontMono,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        NeoButton(
+                          label: syncState.status == SyncStatus.syncing
+                              ? 'SYNCING…'
+                              : 'SYNC NOW',
+                          color: NeoColors.cyan,
+                          onPressed:
+                              syncState.status == SyncStatus.syncing
+                                  ? null
+                                  : () => ref
+                                      .read(cloudSyncProvider.notifier)
+                                      .sync(),
+                        ),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // ── AI & Storage ──────────────────────────────────────────────
             Text('AI & STORAGE',
                 style: NeoTypography.headlineSmall
                     .copyWith(fontWeight: FontWeight.w900)),
@@ -107,7 +269,7 @@ class SettingsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
 
-            // Open Source & About
+            // ── About ─────────────────────────────────────────────────────
             Text('ABOUT POMNITER',
                 style: NeoTypography.headlineSmall
                     .copyWith(fontWeight: FontWeight.w900)),

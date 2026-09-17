@@ -44,6 +44,10 @@ class ScreenshotEntity {
   late String? summary;
   late bool isFavorite;
 
+  /// ISO 8601 timestamp of the last successful cloud sync for this record.
+  /// Null if never synced (opt-in, Wi-Fi only).
+  String? syncedAt;
+
   /// 384-dimensional MobileCLIP-S0 L2-normalised embedding vector.
   ///
   /// HNSW index configuration:
